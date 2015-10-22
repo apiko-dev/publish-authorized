@@ -1,6 +1,6 @@
 Package.describe({
   name: 'jss:publish-authorized',
-  version: '0.1.0',
+  version: '0.1.1',
   // Brief, one-line summary of the package.
   summary: 'Publish only for authorized users or using custom security check',
   // URL to the Git repository containing the source code for this package.
