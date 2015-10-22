@@ -7,15 +7,20 @@
  */
 Meteor.publishAuthorized = function (publisherName, publishFn, securityCheck) {
   var checkPermissions = function (userId) {
-    return _.isFunction(securityCheck) && !!userId && securityCheck(userId) || !!userId;
+    var isAuthorized = !!userId;
+    if (_.isFunction(securityCheck)) {
+      return isAuthorized && securityCheck(userId);
+    } else {
+      return isAuthorized;
+    }
   };
 
   var wrappedFn = function () {
     if (checkPermissions(this.userId)) {
       return publishFn.apply(this, arguments);
     } else {
-      var error = new Meteor.Error('Access denied. You should be authorized to get this data.');
-      this.error(error)
+      var error = new Error('Access denied. Not authorized user.');
+      this.error(error);
     }
   };
 
