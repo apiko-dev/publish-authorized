@@ -1,10 +1,10 @@
-###Publish Authorized
+### Publish Authorized
 
 Enables publish data only to authorized users
 
-###Examples
+### Examples
 
-```
+```javascript
 //enable access to MyCollection only for authorized users
 Meteor.publishAuthorized('mySecuredPublish', function (category) {
   return MyCollection.find({category: category});
