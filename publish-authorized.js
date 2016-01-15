@@ -35,8 +35,7 @@ Meteor.publishAuthorized = function (name, func, options, checker) {
       _.isFunction(checker) ? checker(this.userId) : true
     ]);
     if (!hasAccess) {
-      const error = Meteor.Error('Access denied.');
-      return this.error(error);
+      return this.ready();
     }
     return func.apply(this, arguments);
   }, options);
