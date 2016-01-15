@@ -1,28 +1,43 @@
 /**
- * Create publisher with build-in authorization check
+ * Register a publish handler function with build-in authorization check.
  *
- * @param {string} publisherName name of publisher
- * @param {Function} publishFn publish function
- * @param {Function|*} securityCheck optional predicate. Receives userId as argument and should return true if user is allowed to got data of subscription
+ * @param name {String} identifier for query
+ * @param func {Function} publish handler
+ * @param options {Object}
+ * @param checker {Function} authorization checker
+ *
+ * Server will call handler function on each new subscription,
+ * either when receiving DDP sub message for a named subscription, or on
+ * DDP connect for a universal subscription.
+ *
+ * If name is null, this will be a subscription that is
+ * automatically established and permanently on for all connected
+ * client, instead of a subscription that can be turned on and off
+ * with subscribe().
+ *
+ * options to contain:
+ *  - (mostly internal) is_auto: true if generated automatically
+ *    from an autopublish hook. this is for cosmetic purposes only
+ *    (it lets us determine whether to print a warning suggesting
+ *    that you turn off autopublish.)
  */
-Meteor.publishAuthorized = function (publisherName, publishFn, securityCheck) {
-  var checkPermissions = function (userId) {
-    var isAuthorized = !!userId;
-    if (_.isFunction(securityCheck)) {
-      return isAuthorized && securityCheck(userId);
-    } else {
-      return isAuthorized;
-    }
-  };
+Meteor.publishAuthorized = function (name, func, options, checker) {
+  // We were passed 3 arguments. They may be either (name, args, options)
+  // or (name, args, checker)
+  if (!checker && _.isFunction(options)) {
+    checker = options;
+    options = {};
+  }
 
-  var wrappedFn = function () {
-    if (checkPermissions(this.userId)) {
-      return publishFn.apply(this, arguments);
-    } else {
-      var error = new Error('Access denied. Not authorized user.');
-      this.error(error);
+  Meteor.publish(name, function () {
+    const hasAccess = _.every([
+      !!this.userId,
+      _.isFunction(checker) ? checker(this.userId) : true
+    ]);
+    if (!hasAccess) {
+      const error = Meteor.Error('Access denied.');
+      return this.error(error);
     }
-  };
-
-  Meteor.publish(publisherName, wrappedFn);
+    return func.apply(this, arguments);
+  }, options);
 };
