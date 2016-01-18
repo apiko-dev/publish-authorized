@@ -30,10 +30,15 @@ Meteor.publishAuthorized = function (name, func, options, checker) {
   }
 
   Meteor.publish(name, function () {
-    const hasAccess = _.every([
-      !!this.userId,
-      _.isFunction(checker) ? checker(this.userId) : true
-    ]);
+    let hasAccess = !!this.userId;
+    if (hasAccess && _.isFunction(checker)) {
+      try {
+        hasAccess = checker.apply(this, arguments);
+      }
+      catch (error) {
+        hasAccess = false;
+      }
+    }
     if (!hasAccess) {
       return this.ready();
     }
