@@ -1,6 +1,6 @@
 Package.describe({
   name: 'jss:publish-authorized',
-  version: '0.2.2',
+  version: '0.2.3',
   summary: 'Publish only for authorized users or using custom security check',
   git: 'https://github.com/JSSolutions/publish-authorized',
   documentation: 'README.md'
