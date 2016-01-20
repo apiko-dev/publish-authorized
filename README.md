@@ -1,6 +1,6 @@
-[![Meteor Icon](http://icon.meteor.com/package/jss:publish-authorized)](https://atmospherejs.com/jss/publish-authorized)
-
 ## Publish Authorized
+
+[![Meteor Icon](http://icon.meteor.com/package/jss:publish-authorized)](https://atmospherejs.com/jss/publish-authorized)
 
 Enables publish data only to authorized users
 
